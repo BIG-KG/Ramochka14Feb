@@ -1,0 +1,153 @@
+Turbo Assembler	 Version 4.1	    02/10/25 13:21:22	    Page 1
+ramk.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     .186
+      4				     org 100h
+      5
+      6	0100			     main:
+      7	0100  B8 0005			     mov ax, 5
+      8	0103  BB 0003			     mov bx, 3
+      9	0106  BF 0000r			     mov di, offset FrameStyle
+     10	0109  E8 003D			     call Drawline
+     11	010C  B8 0005			     mov ax, 5
+     12	010F  BB 0003			     mov bx, 3
+     13	0112  BF 0003r			     mov di, offset FrameStyle+3
+     14	0115  EB 0A 90			     jmp checkLineNum
+     15
+     16	0118				 drawCurrLine:
+     17	0118  50			     push ax
+     18	0119  53			     push bx
+     19	011A  57			     push di
+     20	011B  E8 002B			     call Drawline
+     21	011E  5F			     pop  di
+     22	011F  5B			     pop  bx
+     23	0120  58			     pop  ax
+     24
+     25	0121				 checkLineNum:
+     26	0121  43			     inc bx
+     27	0122  83 FB 11			     cmp bx, 17
+     28	0125  7E F1			     jle drawCurrLine
+     29
+     30	0127  BF 0006r			     mov di, offset FrameStyle+6
+     31	012A  E8 001C			     call Drawline
+     32
+     33
+     34	012D  BE 0009r			     mov si, offset Letter
+     35	0130  BF 064E			     mov di, (80*2*10) + (7*2)
+     36	0133  B9 0008			     mov cx, 8
+     37
+     38
+     39	0136				     WriteLett:
+     40	0136  8A 04			     mov al, [si]
+     41	0138  46			     inc si
+     42	0139  26: 89 05			     mov es:[di], ax
+     43	013C  83 C7 02			     add di, 2
+     44	013F  83 E9 01			     sub cx, 1
+     45	0142  75 F2			     jne WriteLett
+     46
+     47
+     48
+     49	0144  B8 4C00			     mov ax, 4C00h
+     50	0147  CD 21			     int 21h
+     51
+     52
+     53
+     54
+     55				     ;===========================================
+     56				     ;
+     57				     ;
+Turbo Assembler	 Version 4.1	    02/10/25 13:21:22	    Page 2
+ramk.asm
+
+
+
+     58				     ;	Entery:	AX - oX, BX - oY, Bi - frameData
+     59				     ;	Exit  :	None
+     60				     ;	Destr :	AX, BX,	CX, DX,	ES
+     61				     ;===========================================
+     62	0149			     .data
+     63	0000  31 32 33 34 35 36	37+  FrameStyle	db '123456789'
+     64	      38 39
+     65	0009  48 69 20 67 75 79	73+  letter	db 'Hi guys!'
+     66	      21
+     67
+     68	0011			     .code
+     69	0149			     Drawline proc
+     70
+     71	0149  B9 B800			     mov cx, 0b800h
+     72	014C  8E C1			     mov es, cx
+     73	014E  B9 0000			     mov cx, 0h
+     74	0151  8B CB			     mov cx, bx
+     75	0153  69 C9 00A0		     imul cx, 80 * 2 ; cx - current
+     76	0157  6B C0 02			     imul ax, 2	     ;ax - max
+     77	015A  03 C8			     add cx, ax
+     78	015C  8B C1			     mov ax, cx
+     79	015E  05 0078			     add ax, 60*2
+     80					     ;last and first
+     81	0161  8A 55 02			     mov dl, [di + 2]
+     82	0164  8B D8			     mov bx, ax
+     83	0166  26: 88 17			     mov es:[bx], dl
+     84
+     85	0169  8A 15			     mov dl, [di]
+     86	016B  8B D9			     mov bx, cx
+     87	016D  26: 88 17			     mov es:[bx], dl
+     88
+     89	0170  8A 55 01			     mov dl, [di + 1]
+     90	0173  EB 04 90			     jmp Check
+     91
+     92	0176				 Do:
+     93	0176  26: 88 17			     mov es:[bx], dl
+     94
+     95	0179				 Check:
+     96	0179  83 C3 02			     add bx, 2
+     97	017C  3B C3			     cmp ax, bx
+     98	017E  7F F6			     jg	Do
+     99	0180  C3			     ret
+    100
+    101	0181				     endp
+    102
+    103				     end main
+Turbo Assembler	 Version 4.1	    02/10/25 13:21:22	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/10/25"
+??FILENAME			  Text	 "ramk	  "
+??TIME				  Text	 "13:21:22"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 RAMK
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+CHECK				  Near	 DGROUP:0179
+CHECKLINENUM			  Near	 DGROUP:0121
+DO				  Near	 DGROUP:0176
+DRAWCURRLINE			  Near	 DGROUP:0118
+DRAWLINE			  Near	 DGROUP:0149
+FRAMESTYLE			  Byte	 DGROUP:0000
+LETTER				  Byte	 DGROUP:0009
+MAIN				  Near	 DGROUP:0100
+WRITELETT			  Near	 DGROUP:0136
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0011 Word	  Public  DATA
+  _TEXT				  16  0181 Word	  Public  CODE
+
