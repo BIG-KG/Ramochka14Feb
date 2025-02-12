@@ -29,6 +29,10 @@ getarg:
 	call: get_num
 	mov RamkStyle, al
 
+;INPUT: SI - sourse of 
+
+	
+
 ;DESTRT - CX
 skip_string:
 
