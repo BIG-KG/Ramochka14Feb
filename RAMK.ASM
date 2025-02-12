@@ -21,7 +21,7 @@ main:
 	pop  di
 	pop  bx
 	pop  ax
-
+		
     checkLineNum:
 	inc bx
 	cmp bx, 17
