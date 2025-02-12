@@ -6,7 +6,7 @@ org 100h
 .data
 Ycoord      db 0
 Xcoord      db 0
-StringStert dw 0
+StringStart dw 0
 RamkStyle   db 0
 
 .code
@@ -22,7 +22,12 @@ getarg:
 	mov Xcoord, al
 
 	call: skip_space
-	mov al, bl
+	mov StringStart, bx
+	call: skip_string
+
+	call: skip_space
+	call: get_num
+	mov RamkStyle, al
 
 ;DESTRT - CX
 skip_string:
