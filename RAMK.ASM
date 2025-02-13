@@ -6,20 +6,32 @@ org 100h
 
 .data
 StringStart dw 0
-StringSize  db 0
-RamkStyle   db 0
+StringSize  dw 0
+RamkStyle   dw 0
+testSIGN: db '3 3 testsign$ 1 '
 
-UserStyle   9 REP (0)
-oneLine     db 218, 191, 196, 179, 0, 179, 192, 191, 217
+oneLine     db 218, 196, 191, 179, 0, 179, 192, 196, 217
 
-modesArray dw 
-	offset UserStyle
-	offset oneLine
+modesArray dw 0, offset oneLine
+.code
 
 main:
-	call: getarg
-	call: calculateRamckSize
-	call: calculateRamckStyle
+	;mov ax, 4
+	;mov bx, 5
+	;mov cx, 8
+	;mov dx, 9
+	;mov di, offset oneLine
+	;call Drawline	
+	
+	;mov ax, 4c00h
+	;int 21h
+	
+	mov bp, 0
+	call getarg
+	call calculateRamckSize
+	call calculateRamckStyle
+	call draw_ramk
+	ret
 
 ; ax - xleft
 ; bx - yleft
@@ -39,13 +51,14 @@ calculateRamckSize:
 
 
 calculateRamckStyle:
+	push dx
 	mov dx, RamkStyle
 	and dx, 111b
-	dec dx
 	imul dx, 2 
 	mov di, offset modesArray
 	add	di, dx
 	mov di, [di]
+	pop dx
 	ret
 
 
@@ -55,17 +68,22 @@ draw_ramk:
 
 	push bx
 	push dx
+	push cx
 	call Drawline
-	pop dx
-	pop bx
+	pop  cx
+	pop  dx
+	pop  bx
+
 	add di, 3
 	jmp checkLineNum
 	
     drawCurrLine:
 	push dx
+	push cx
 	push bx
 	call Drawline
 	pop  bx
+	pop  cx
 	pop  dx
 		
     checkLineNum:
@@ -76,12 +94,17 @@ draw_ramk:
 	
 	add di, 3
 	push dx
+	push cx
 	push bx
 	call Drawline
 	pop  bx
+	pop  cx
 	pop  dx
 
 	pop bx
+
+	mov ax, 4c00h
+	int 21h
 
 	ret
 	
@@ -113,10 +136,12 @@ wrightSign:
 letter     db 'Hi guys!'
 
 .code	
+; destr - dx, cx, bx
 Drawline proc
 
 	mov dx, 0b800h; di - symbol sourse
 	mov es, dx
+	mov dx, bx
 	imul bx, 80;bx - current copyng symbol
 	add bx, ax
 	imul bx, 2
@@ -125,57 +150,61 @@ Drawline proc
 	add dx, cx
 	imul dx, 2
 
-	mov dl, [di]
-	mov es:[bx], dl
+	mov cl, [di]
+	mov es:[bx], cl
 
-	mov dl, [di + 1]	
+	mov cl, [di + 1]	
 	jmp Check
 	
     Do:
-	mov es:[bx], dl
+	mov es:[bx], cl
 	
     Check:
 	add bx, 2
 	cmp dx, bx
 	jg Do
 
-	mov dl, [di + 2]
-	mov es:[bx], dl
+	mov cl, [di + 2]
+	mov es:[bx], cl
+
+
 	
 	ret
 	
 	endp
 
 
-.code
+
 ; bx - current simb, dx - current arg
 getarg:
-    mov bx, 80h
-    call: skip_space
-	call: get_num
-	mov si, al;xcoord
+    mov bx, offset testSIGN
+    call skip_space
+	call get_num
+	mov si, ax;xcoord
 
-	call: skip_space
-	call: get_num
-	mov di, al; yCoord
+	call skip_space
+	call get_num
+	mov di, ax; yCoord
 
-	call: skip_space
+	call skip_space
 	mov StringStart, bx
-	call: skip_string
+	call skip_string
 
-	call: skip_space
-	call: get_num
-	mov RamkStyle, al
+	call skip_space
+	call get_num
+	mov RamkStyle, ax
 
 	cmp al, 0
-	je: PresetMode
+	jne PresetMode
 
-	call: skip_space
-	mov UserStyle, al
+	call skip_space
+	mov modesArray, bx
 
 	PresetMode:
 	mov ax, si
 	mov bx, di
+	xor ah, ah
+	xor bh, bh
 	ret
 
 ;INPUT: SI - sourse of 
@@ -184,43 +213,56 @@ getarg:
 
 ;DESTRT - CX, DX, BX
 skip_string:
-
+	xor cx, cx
 	mov cx, '$'
 	xor dx, dx
-	jmp: isEndOfString
+	jmp isEndOfString
 
 	skipSymb:
 	inc bx
 	inc dx
 
 	isEndOfString:
-	cmp [bx], cx
-	jne: skipSymb
+	cmp [bx], cl
+	jne skipSymb
+
+	inc bx
+	mov StringSize, dx
 
 	ret
 
 ; DESTRT - AX, CX
 get_num:
-
 	xor al, al
+	xor dx, dx
+	mov bp, ' '
 
 	addToNum:
-	imul ak, 10
+	imul ax, 10
 	mov cx, [bx]
 	sub cx, '0'
 	add al, cl
 	inc bx
+	inc dx
 
 	isPartOfNum:
-	cmp 0, [bx]
-	jne: addToNum
-	mov StringSize, dl
+	xor cx, cx
+	mov cl, [bx]
+	cmp bp, cx
+	jne addToNum
+
 	ret
 
 skip_space:
+	push ax 
+	mov al, ' '
+	jmp IsspaseTEst
+	startSkip:
 	inc bx
-	cmp 0, [bx]
-	je: skip_space
+	IsspaseTEst:
+	cmp al, [bx]
+	je startSkip
+	pop ax
 	ret	
 
 end main
