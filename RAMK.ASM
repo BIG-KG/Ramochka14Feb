@@ -5,10 +5,11 @@ org 100h
 
 
 .data
-StringStart dw 0
-StringSize  dw 0
-RamkStyle   dw 0
-testSIGN: db '3 3 very very lon testsign for test on 24Febx$ 1 '
+EndOfStringAdr	dw 0
+StringStart 	dw 0
+StringSize  	dw 0
+RamkStyle   	dw 0
+testSIGN: 		db '3 3 very very lon testsign for test on 24Febx$ 1 '
 
 oneLine     db 218, 196, 191, 179, 0, 179, 192, 196, 217
 doubleline  db 201, 205, 187, 186, 0, 186, 200, 205, 188	
@@ -18,30 +19,30 @@ hearts      db 3,   3,   3,   3,   0, 3,   3,   3,   3
 modesArray dw 0, offset oneLine, offset doubleline, offset hearts
 .code
 
-main:
-	;mov ax, 4
-	;mov bx, 5
-	;mov cx, 8
-	;mov dx, 9
-	;mov di, offset oneLine
-	;call Drawline	
-	
-	;mov ax, 4c00h
-	;int 21h
-	
-	mov bp, 0
-	call getarg
-	call calculateRamckSize
-	call calculateRamckStyle
-	call draw_ramk
+main proc
+	xor ax, ax					; es:[bx] leads to 80h in PSP
+	mov es, ax
+	mov bx, 80h
+
+	mov ax, 80h					; 80h + size of cmd String -> EndOfStringAdr
+	add al, [bx]
+	mov EndOfStringAdr, ax
+
+	mov bp, 0					
+	call getarg					; func gets argument from command line, in addres 81h
+	call calculateFrameSize
+	call calculateFrameStyle
+	call draw_ramk				; draw frame via command line parametrs
 	ret
+
+main endp
 
 ; ax - xleft
 ; bx - yleft
 ; cx - xleft
 ; dx - yleft
 ; di - sourese of mode
-calculateRamckSize:
+calculateFrameSize:
 	mov cx, StringSize
 	add cx, 8
 	add cx, ax
@@ -53,7 +54,7 @@ calculateRamckSize:
 	ret
 
 
-calculateRamckStyle:
+calculateFrameStyle:
 	push dx
 	mov dx, RamkStyle
 	and dx, 111b
@@ -197,7 +198,7 @@ Drawline proc
 
 
 ; bx - current simb, dx - current arg
-getarg:
+getarg proc
     mov bx, 81h	
     call skip_space
 	call get_num
@@ -228,6 +229,8 @@ getarg:
 	xor bh, bh
 	ret
 
+getarg endp 
+
 ;INPUT: SI - sourse of 
 
 	
@@ -253,26 +256,33 @@ skip_string:
 	ret
 
 ; DESTRT - AX, CX
-get_num:
-	xor al, al
+get_num proc
+	xor al, al				
 	xor dx, dx
 	mov bp, ' '
 
-	addToNum:
+	addToNum:					; ax = ax * 10 + (next_number_inString, ax - result value)
 	imul ax, 10
 	mov cx, [bx]
 	sub cx, '0'
 	add al, cl
-	inc bx
-	inc dx
+	inc bx						; current_addres ++
+	inc dx						; sizeOfString ++
+
+	cmp bx, EndOfStringAdr		; if End of string(bx == EndOfStringAdr) go to return
+	jge EndOfString
 
 	isPartOfNum:
-	xor cx, cx
+	xor cx, cx					; if currSimb([bx]) is not spase repeat
 	mov cl, [bx]
 	cmp bp, cx
 	jne addToNum
 
+
+	EndOfString:
+
 	ret
+get_num endp
 
 skip_space:
 	push ax 
