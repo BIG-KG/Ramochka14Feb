@@ -8,9 +8,12 @@ org 100h
 StringStart dw 0
 StringSize  dw 0
 RamkStyle   dw 0
-testSIGN: db '3 3 testsign$ 1 '
+testSIGN: db '3 3 very very lon testsign for test on 24Febx$ 0 123456789 '
 
 oneLine     db 218, 196, 191, 179, 0, 179, 192, 196, 217
+doubleline  db 201, 205, 187, 186, 0, 186, 200, 205, 188	
+hearts      db 3,   3,   3,   3,   0, 3,   3,   3,   3
+
 
 modesArray dw 0, offset oneLine
 .code
@@ -103,6 +106,8 @@ draw_ramk:
 
 	pop bx
 
+	call wrightSign
+
 	mov ax, 4c00h
 	int 21h
 
@@ -110,15 +115,31 @@ draw_ramk:
 	
 	
 		
-
+; bx - current poc
 wrightSign:
+
 	add bx, dx
 	shr bx, 1
 	add ax, 4
 	imul bx, 80
 	add bx, ax
 	shl bx, 1
+
+	xor si, si
+	add si, StringStart
+	mov dl, '$'
+	jmp isEndOfPrintString
+
+	printLEtterOndisp:
+	mov al, [si]
+	mov es:[bx], al
+	inc si
+	add bx, 2
 	
+
+	isEndOfPrintString:
+	cmp dl, [si]
+	jne printLEtterOndisp
 
 
 	ret
@@ -177,7 +198,7 @@ Drawline proc
 
 ; bx - current simb, dx - current arg
 getarg:
-    mov bx, offset testSIGN
+    mov bx, 80h
     call skip_space
 	call get_num
 	mov si, ax;xcoord

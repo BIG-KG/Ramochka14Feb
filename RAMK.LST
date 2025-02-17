@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 1
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 1
 ramk.asm
 
 
@@ -13,289 +13,323 @@ ramk.asm
       8	0000  0000		     StringStart dw 0
       9	0002  0000		     StringSize	 dw 0
      10	0004  0000		     RamkStyle	 dw 0
-     11	0006  33 20 33 20 74 65	73+  testSIGN: db '3 3 testsign$ 1 '
-     12	      74 73 69 67 6E 24	20+
-     13	      31 20
-     14
-     15	0016  DA C4 BF B3 00 B3	C0+  oneLine	 db 218, 196, 191, 179,	0, 179,	192, 191, 217
-     16	      BF D9
-     17
-     18	001F  0000 0016r	     modesArray	dw 0, offset oneLine
-     19	0023			     .code
+     11	0006  33 20 33 20 76 65	72+  testSIGN: db '3 3 very very lon testsign for test on 24Febx$ 0 123456789 '
+     12	      79 20 76 65 72 79	20+
+     13	      6C 6F 6E 20 74 65	73+
+     14	      74 73 69 67 6E 20	66+
+     15	      6F 72 20 74 65 73	74+
+     16	      20 6F 6E 20 32 34	46+
+     17	      65 62 78 24 20 30	20+
+     18	      31 32 33 34 35 36	37+
+     19	      38 39 20
      20
-     21	0100			     main:
-     22					     ;mov ax, 4
-     23					     ;mov bx, 5
-     24					     ;mov cx, 8
-     25					     ;mov dx, 9
-     26					     ;mov di, offset oneLine
-     27					     ;call Drawline
+     21	0041  DA C4 BF B3 00 B3	C0+  oneLine	 db 218, 196, 191, 179,	0, 179,	192, 196, 217
+     22	      C4 D9
+     23	004A  C9 CD BB BA 00 BA	C8+  doubleline	 db 201, 205, 187, 186,	0, 186,	200, 205, 188
+     24	      CD BC
+     25	0053  03 03 03 03 00 03	03+  hearts	 db 3,	 3,   3,   3,	0, 3,	3,   3,	  3
+     26	      03 03
+     27
      28
-     29					     ;mov ax, 4c00h
-     30					     ;int 21h
+     29	005C  0000 0041r	     modesArray	dw 0, offset oneLine
+     30	0060			     .code
      31
-     32	0100  BD 0000			     mov bp, 0
-     33	0103  E8 00A2			     call getarg
-     34	0106  E8 0007			     call calculateRamckSize
-     35	0109  E8 0015			     call calculateRamckStyle
-     36	010C  E8 0026			     call draw_ramk
-     37	010F  C3			     ret
-     38
-     39				     ; ax - xleft
-     40				     ; bx - yleft
-     41				     ; cx - xleft
-     42				     ; dx - yleft
-     43				     ; di - sourese of mode
-     44	0110			     calculateRamckSize:
-     45	0110  8B 0E 0002r		     mov cx, StringSize
-     46	0114  83 C1 08			     add cx, 8
-     47	0117  03 C8			     add cx, ax
-     48
-     49	0119  33 D2			     xor dx, dx
-     50	011B  03 D3			     add dx, bx
-     51	011D  83 C2 10			     add dx, 16
-     52
-     53	0120  C3			     ret
-     54
-     55
-     56	0121			     calculateRamckStyle:
-     57	0121  52			     push dx
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 2
+     32	0100			     main:
+     33					     ;mov ax, 4
+     34					     ;mov bx, 5
+     35					     ;mov cx, 8
+     36					     ;mov dx, 9
+     37					     ;mov di, offset oneLine
+     38					     ;call Drawline
+     39
+     40					     ;mov ax, 4c00h
+     41					     ;int 21h
+     42
+     43	0100  BD 0000			     mov bp, 0
+     44	0103  E8 00BD			     call getarg
+     45	0106  E8 0007			     call calculateRamckSize
+     46	0109  E8 0015			     call calculateRamckStyle
+     47	010C  E8 0026			     call draw_ramk
+     48	010F  C3			     ret
+     49
+     50				     ; ax - xleft
+     51				     ; bx - yleft
+     52				     ; cx - xleft
+     53				     ; dx - yleft
+     54				     ; di - sourese of mode
+     55	0110			     calculateRamckSize:
+     56	0110  8B 0E 0002r		     mov cx, StringSize
+     57	0114  83 C1 08			     add cx, 8
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 2
 ramk.asm
 
 
 
-     58	0122  8B 16 0004r		     mov dx, RamkStyle
-     59	0126  83 E2 07			     and dx, 111b
-     60	0129  6B D2 02			     imul dx, 2
-     61	012C  BF 001Fr			     mov di, offset modesArray
-     62	012F  03 FA			     add     di, dx
-     63	0131  8B 3D			     mov di, [di]
-     64	0133  5A			     pop dx
-     65	0134  C3			     ret
+     58	0117  03 C8			     add cx, ax
+     59
+     60	0119  33 D2			     xor dx, dx
+     61	011B  03 D3			     add dx, bx
+     62	011D  83 C2 10			     add dx, 16
+     63
+     64	0120  C3			     ret
+     65
      66
-     67
-     68
-     69	0135			     draw_ramk:
-     70	0135  53			     push bx; start draw window
-     71
-     72	0136  53			     push bx
-     73	0137  52			     push dx
-     74	0138  51			     push cx
-     75	0139  E8 0039			     call Drawline
-     76	013C  59			     pop  cx
-     77	013D  5A			     pop  dx
-     78	013E  5B			     pop  bx
+     67	0121			     calculateRamckStyle:
+     68	0121  52			     push dx
+     69	0122  8B 16 0004r		     mov dx, RamkStyle
+     70	0126  83 E2 07			     and dx, 111b
+     71	0129  6B D2 02			     imul dx, 2
+     72	012C  BF 005Cr			     mov di, offset modesArray
+     73	012F  03 FA			     add     di, dx
+     74	0131  8B 3D			     mov di, [di]
+     75	0133  5A			     pop dx
+     76	0134  C3			     ret
+     77
+     78
      79
-     80	013F  83 C7 03			     add di, 3
-     81	0142  EB 0A 90			     jmp checkLineNum
+     80	0135			     draw_ramk:
+     81	0135  53			     push bx; start draw window
      82
-     83	0145				 drawCurrLine:
-     84	0145  52			     push dx
-     85	0146  51			     push cx
-     86	0147  53			     push bx
-     87	0148  E8 002A			     call Drawline
-     88	014B  5B			     pop  bx
-     89	014C  59			     pop  cx
-     90	014D  5A			     pop  dx
-     91
-     92	014E				 checkLineNum:
-     93	014E  43			     inc bx
-     94
-     95	014F  3B DA			     cmp bx, dx
-     96	0151  7C F2			     jl	drawCurrLine
-     97
-     98	0153  83 C7 03			     add di, 3
-     99	0156  52			     push dx
-    100	0157  51			     push cx
-    101	0158  53			     push bx
-    102	0159  E8 0019			     call Drawline
-    103	015C  5B			     pop  bx
-    104	015D  59			     pop  cx
-    105	015E  5A			     pop  dx
-    106
-    107	015F  5B			     pop bx
+     83	0136  53			     push bx
+     84	0137  52			     push dx
+     85	0138  51			     push cx
+     86	0139  E8 0054			     call Drawline
+     87	013C  59			     pop  cx
+     88	013D  5A			     pop  dx
+     89	013E  5B			     pop  bx
+     90
+     91	013F  83 C7 03			     add di, 3
+     92	0142  EB 0A 90			     jmp checkLineNum
+     93
+     94	0145				 drawCurrLine:
+     95	0145  52			     push dx
+     96	0146  51			     push cx
+     97	0147  53			     push bx
+     98	0148  E8 0045			     call Drawline
+     99	014B  5B			     pop  bx
+    100	014C  59			     pop  cx
+    101	014D  5A			     pop  dx
+    102
+    103	014E				 checkLineNum:
+    104	014E  43			     inc bx
+    105
+    106	014F  3B DA			     cmp bx, dx
+    107	0151  7C F2			     jl	drawCurrLine
     108
-    109	0160  B8 4C00			     mov ax, 4c00h
-    110	0163  CD 21			     int 21h
-    111
-    112	0165  C3			     ret
-    113
-    114
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 3
+    109	0153  83 C7 03			     add di, 3
+    110	0156  52			     push dx
+    111	0157  51			     push cx
+    112	0158  53			     push bx
+    113	0159  E8 0034			     call Drawline
+    114	015C  5B			     pop  bx
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 3
 ramk.asm
 
 
 
-    115
-    116
-    117	0166			     wrightSign:
-    118	0166  03 DA			     add bx, dx
-    119	0168  D1 EB			     shr bx, 1
-    120	016A  05 0004			     add ax, 4
-    121	016D  6B DB 50			     imul bx, 80
-    122	0170  03 D8			     add bx, ax
-    123	0172  D1 E3			     shl bx, 1
+    115	015D  59			     pop  cx
+    116	015E  5A			     pop  dx
+    117
+    118	015F  5B			     pop bx
+    119
+    120	0160  E8 0006			     call wrightSign
+    121
+    122	0163  B8 4C00			     mov ax, 4c00h
+    123	0166  CD 21			     int 21h
     124
-    125
+    125	0168  C3			     ret
     126
-    127	0174  C3			     ret
+    127
     128
-    129
-    130
-    131				     ;===========================================
-    132				     ;
-    133				     ;
-    134				     ;	Entery:	AX - oX, BX - oY, Bi - frameData
-    135				     ;	Exit  :	None
-    136				     ;	Destr :	AX, BX,	CX, DX,	ES
-    137				     ;===========================================
-    138	0175			     .data
-    139	0023  48 69 20 67 75 79	73+  letter	db 'Hi guys!'
-    140	      21
-    141
-    142	002B			     .code
-    143				     ; destr - dx, cx, bx
-    144	0175			     Drawline proc
-    145
-    146	0175  BA B800			     mov dx, 0b800h; di	- symbol sourse
-    147	0178  8E C2			     mov es, dx
-    148	017A  8B D3			     mov dx, bx
-    149	017C  6B DB 50			     imul bx, 80;bx - current copyng symbol
-    150	017F  03 D8			     add bx, ax
-    151	0181  6B DB 02			     imul bx, 2
-    152
-    153	0184  6B D2 50			     imul dx, 80; dx - max copying symbol
-    154	0187  03 D1			     add dx, cx
-    155	0189  6B D2 02			     imul dx, 2
-    156
-    157	018C  8A 0D			     mov cl, [di]
-    158	018E  26: 88 0F			     mov es:[bx], cl
+    129				     ; bx - current poc
+    130	0169			     wrightSign:
+    131
+    132	0169  03 DA			     add bx, dx
+    133	016B  D1 EB			     shr bx, 1
+    134	016D  05 0004			     add ax, 4
+    135	0170  6B DB 50			     imul bx, 80
+    136	0173  03 D8			     add bx, ax
+    137	0175  D1 E3			     shl bx, 1
+    138
+    139	0177  33 F6			     xor si, si
+    140	0179  03 36 0000r		     add si, StringStart
+    141	017D  B2 24			     mov dl, '$'
+    142	017F  EB 0A 90			     jmp isEndOfPrintString
+    143
+    144	0182				     printLEtterOndisp:
+    145	0182  8A 04			     mov al, [si]
+    146	0184  26: 88 07			     mov es:[bx], al
+    147	0187  46			     inc si
+    148	0188  83 C3 02			     add bx, 2
+    149
+    150
+    151	018B				     isEndOfPrintString:
+    152	018B  3A 14			     cmp dl, [si]
+    153	018D  75 F3			     jne printLEtterOndisp
+    154
+    155
+    156	018F  C3			     ret
+    157
+    158
     159
-    160	0191  8A 4D 01			     mov cl, [di + 1]
-    161	0194  EB 04 90			     jmp Check
-    162
-    163	0197				 Do:
-    164	0197  26: 88 0F			     mov es:[bx], cl
-    165
-    166	019A				 Check:
-    167	019A  83 C3 02			     add bx, 2
-    168	019D  3B D3			     cmp dx, bx
-    169	019F  7F F6			     jg	Do
+    160				     ;===========================================
+    161				     ;
+    162				     ;
+    163				     ;	Entery:	AX - oX, BX - oY, Bi - frameData
+    164				     ;	Exit  :	None
+    165				     ;	Destr :	AX, BX,	CX, DX,	ES
+    166				     ;===========================================
+    167	0190			     .data
+    168	0060  48 69 20 67 75 79	73+  letter	db 'Hi guys!'
+    169	      21
     170
-    171	01A1  8A 4D 02			     mov cl, [di + 2]
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 4
+    171	0068			     .code
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 4
 ramk.asm
 
 
 
-    172	01A4  26: 88 0F			     mov es:[bx], cl
-    173
+    172				     ; destr - dx, cx, bx
+    173	0190			     Drawline proc
     174
-    175
-    176	01A7  C3			     ret
-    177
-    178	01A8				     endp
-    179
-    180
+    175	0190  BA B800			     mov dx, 0b800h; di	- symbol sourse
+    176	0193  8E C2			     mov es, dx
+    177	0195  8B D3			     mov dx, bx
+    178	0197  6B DB 50			     imul bx, 80;bx - current copyng symbol
+    179	019A  03 D8			     add bx, ax
+    180	019C  6B DB 02			     imul bx, 2
     181
-    182				     ; bx - current simb, dx - current arg
-    183	01A8			     getarg:
-    184	01A8  BB 0006r			 mov bx, offset	testSIGN
-    185	01AB  E8 0066			 call skip_space
-    186	01AE  E8 0047			     call get_num
-    187	01B1  8B F0			     mov si, ax;xcoord
+    182	019F  6B D2 50			     imul dx, 80; dx - max copying symbol
+    183	01A2  03 D1			     add dx, cx
+    184	01A4  6B D2 02			     imul dx, 2
+    185
+    186	01A7  8A 0D			     mov cl, [di]
+    187	01A9  26: 88 0F			     mov es:[bx], cl
     188
-    189	01B3  E8 005E			     call skip_space
-    190	01B6  E8 003F			     call get_num
-    191	01B9  8B F8			     mov di, ax; yCoord
-    192
-    193	01BB  E8 0056			     call skip_space
-    194	01BE  89 1E 0000r		     mov StringStart, bx
-    195	01C2  E8 001D			     call skip_string
-    196
-    197	01C5  E8 004C			     call skip_space
-    198	01C8  E8 002D			     call get_num
-    199	01CB  A3 0004r			     mov RamkStyle, ax
-    200
-    201	01CE  3C 00			     cmp al, 0
-    202	01D0  75 07			     jne PresetMode
+    189	01AC  8A 4D 01			     mov cl, [di + 1]
+    190	01AF  EB 04 90			     jmp Check
+    191
+    192	01B2				 Do:
+    193	01B2  26: 88 0F			     mov es:[bx], cl
+    194
+    195	01B5				 Check:
+    196	01B5  83 C3 02			     add bx, 2
+    197	01B8  3B D3			     cmp dx, bx
+    198	01BA  7F F6			     jg	Do
+    199
+    200	01BC  8A 4D 02			     mov cl, [di + 2]
+    201	01BF  26: 88 0F			     mov es:[bx], cl
+    202
     203
-    204	01D2  E8 003F			     call skip_space
-    205	01D5  89 1E 001Fr		     mov modesArray, bx
+    204
+    205	01C2  C3			     ret
     206
-    207	01D9				     PresetMode:
-    208	01D9  8B C6			     mov ax, si
-    209	01DB  8B DF			     mov bx, di
-    210	01DD  32 E4			     xor ah, ah
-    211	01DF  32 FF			     xor bh, bh
-    212	01E1  C3			     ret
-    213
-    214				     ;INPUT: SI	- sourse of
-    215
-    216
+    207	01C3				     endp
+    208
+    209
+    210
+    211				     ; bx - current simb, dx - current arg
+    212	01C3			     getarg:
+    213	01C3  BB 0006r			 mov bx, offset	testSIGN
+    214	01C6  E8 0066			 call skip_space
+    215	01C9  E8 0047			     call get_num
+    216	01CC  8B F0			     mov si, ax;xcoord
     217
-    218				     ;DESTRT - CX, DX, BX
-    219	01E2			     skip_string:
-    220	01E2  33 C9			     xor cx, cx
-    221	01E4  B9 0024			     mov cx, '$'
-    222	01E7  33 D2			     xor dx, dx
-    223	01E9  EB 03 90			     jmp isEndOfString
-    224
-    225	01EC				     skipSymb:
-    226	01EC  43			     inc bx
-    227	01ED  42			     inc dx
-    228
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 5
+    218	01CE  E8 005E			     call skip_space
+    219	01D1  E8 003F			     call get_num
+    220	01D4  8B F8			     mov di, ax; yCoord
+    221
+    222	01D6  E8 0056			     call skip_space
+    223	01D9  89 1E 0000r		     mov StringStart, bx
+    224	01DD  E8 001D			     call skip_string
+    225
+    226	01E0  E8 004C			     call skip_space
+    227	01E3  E8 002D			     call get_num
+    228	01E6  A3 0004r			     mov RamkStyle, ax
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 5
 ramk.asm
 
 
 
-    229	01EE				     isEndOfString:
-    230	01EE  38 0F			     cmp [bx], cl
-    231	01F0  75 FA			     jne skipSymb
+    229
+    230	01E9  3C 00			     cmp al, 0
+    231	01EB  75 07			     jne PresetMode
     232
-    233	01F2  43			     inc bx
-    234	01F3  89 16 0002r		     mov StringSize, dx
+    233	01ED  E8 003F			     call skip_space
+    234	01F0  89 1E 005Cr		     mov modesArray, bx
     235
-    236	01F7  C3			     ret
-    237
-    238				     ; DESTRT -	AX, CX
-    239	01F8			     get_num:
-    240	01F8  32 C0			     xor al, al
-    241	01FA  33 D2			     xor dx, dx
-    242	01FC  BD 0020			     mov bp, ' '
-    243
-    244	01FF				     addToNum:
-    245	01FF  6B C0 0A			     imul ax, 10
-    246	0202  8B 0F			     mov cx, [bx]
-    247	0204  83 E9 30			     sub cx, '0'
-    248	0207  02 C1			     add al, cl
-    249	0209  43			     inc bx
-    250	020A  42			     inc dx
-    251
-    252	020B				     isPartOfNum:
-    253	020B  33 C9			     xor cx, cx
-    254	020D  8A 0F			     mov cl, [bx]
-    255	020F  3B E9			     cmp bp, cx
-    256	0211  75 EC			     jne addToNum
+    236	01F4				     PresetMode:
+    237	01F4  8B C6			     mov ax, si
+    238	01F6  8B DF			     mov bx, di
+    239	01F8  32 E4			     xor ah, ah
+    240	01FA  32 FF			     xor bh, bh
+    241	01FC  C3			     ret
+    242
+    243				     ;INPUT: SI	- sourse of
+    244
+    245
+    246
+    247				     ;DESTRT - CX, DX, BX
+    248	01FD			     skip_string:
+    249	01FD  33 C9			     xor cx, cx
+    250	01FF  B9 0024			     mov cx, '$'
+    251	0202  33 D2			     xor dx, dx
+    252	0204  EB 03 90			     jmp isEndOfString
+    253
+    254	0207				     skipSymb:
+    255	0207  43			     inc bx
+    256	0208  42			     inc dx
     257
-    258	0213  C3			     ret
-    259
-    260	0214			     skip_space:
-    261	0214  50			     push ax
-    262	0215  B0 20			     mov al, ' '
-    263	0217  EB 02 90			     jmp IsspaseTEst
-    264	021A				     startSkip:
-    265	021A  43			     inc bx
-    266	021B				     IsspaseTEst:
-    267	021B  3A 07			     cmp al, [bx]
-    268	021D  74 FB			     je	startSkip
-    269	021F  58			     pop ax
-    270	0220  C3			     ret
-    271
-    272				     end main
-Turbo Assembler	 Version 4.1	    02/13/25 05:19:43	    Page 6
+    258	0209				     isEndOfString:
+    259	0209  38 0F			     cmp [bx], cl
+    260	020B  75 FA			     jne skipSymb
+    261
+    262	020D  43			     inc bx
+    263	020E  89 16 0002r		     mov StringSize, dx
+    264
+    265	0212  C3			     ret
+    266
+    267				     ; DESTRT -	AX, CX
+    268	0213			     get_num:
+    269	0213  32 C0			     xor al, al
+    270	0215  33 D2			     xor dx, dx
+    271	0217  BD 0020			     mov bp, ' '
+    272
+    273	021A				     addToNum:
+    274	021A  6B C0 0A			     imul ax, 10
+    275	021D  8B 0F			     mov cx, [bx]
+    276	021F  83 E9 30			     sub cx, '0'
+    277	0222  02 C1			     add al, cl
+    278	0224  43			     inc bx
+    279	0225  42			     inc dx
+    280
+    281	0226				     isPartOfNum:
+    282	0226  33 C9			     xor cx, cx
+    283	0228  8A 0F			     mov cl, [bx]
+    284	022A  3B E9			     cmp bp, cx
+    285	022C  75 EC			     jne addToNum
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 6
+ramk.asm
+
+
+
+    286
+    287	022E  C3			     ret
+    288
+    289	022F			     skip_space:
+    290	022F  50			     push ax
+    291	0230  B0 20			     mov al, ' '
+    292	0232  EB 02 90			     jmp IsspaseTEst
+    293	0235				     startSkip:
+    294	0235  43			     inc bx
+    295	0236				     IsspaseTEst:
+    296	0236  3A 07			     cmp al, [bx]
+    297	0238  74 FB			     je	startSkip
+    298	023A  58			     pop ax
+    299	023B  C3			     ret
+    300
+    301				     end main
+Turbo Assembler	 Version 4.1	    02/17/25 11:19:59	    Page 7
 Symbol Table
 
 
@@ -303,9 +337,9 @@ Symbol Table
 
 Symbol Name			  Type	 Value
 
-??DATE				  Text	 "02/13/25"
+??DATE				  Text	 "02/17/25"
 ??FILENAME			  Text	 "ramk	  "
-??TIME				  Text	 "05:19:43"
+??TIME				  Text	 "11:19:59"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -319,38 +353,42 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-ADDTONUM			  Near	 DGROUP:01FF
+ADDTONUM			  Near	 DGROUP:021A
 CALCULATERAMCKSIZE		  Near	 DGROUP:0110
 CALCULATERAMCKSTYLE		  Near	 DGROUP:0121
-CHECK				  Near	 DGROUP:019A
+CHECK				  Near	 DGROUP:01B5
 CHECKLINENUM			  Near	 DGROUP:014E
-DO				  Near	 DGROUP:0197
+DO				  Near	 DGROUP:01B2
+DOUBLELINE			  Byte	 DGROUP:004A
 DRAWCURRLINE			  Near	 DGROUP:0145
-DRAWLINE			  Near	 DGROUP:0175
+DRAWLINE			  Near	 DGROUP:0190
 DRAW_RAMK			  Near	 DGROUP:0135
-GETARG				  Near	 DGROUP:01A8
-GET_NUM				  Near	 DGROUP:01F8
-ISENDOFSTRING			  Near	 DGROUP:01EE
-ISPARTOFNUM			  Near	 DGROUP:020B
-ISSPASETEST			  Near	 DGROUP:021B
-LETTER				  Byte	 DGROUP:0023
+GETARG				  Near	 DGROUP:01C3
+GET_NUM				  Near	 DGROUP:0213
+HEARTS				  Byte	 DGROUP:0053
+ISENDOFPRINTSTRING		  Near	 DGROUP:018B
+ISENDOFSTRING			  Near	 DGROUP:0209
+ISPARTOFNUM			  Near	 DGROUP:0226
+ISSPASETEST			  Near	 DGROUP:0236
+LETTER				  Byte	 DGROUP:0060
 MAIN				  Near	 DGROUP:0100
-MODESARRAY			  Word	 DGROUP:001F
-ONELINE				  Byte	 DGROUP:0016
-PRESETMODE			  Near	 DGROUP:01D9
+MODESARRAY			  Word	 DGROUP:005C
+ONELINE				  Byte	 DGROUP:0041
+PRESETMODE			  Near	 DGROUP:01F4
+PRINTLETTERONDISP		  Near	 DGROUP:0182
 RAMKSTYLE			  Word	 DGROUP:0004
-SKIPSYMB			  Near	 DGROUP:01EC
-SKIP_SPACE			  Near	 DGROUP:0214
-SKIP_STRING			  Near	 DGROUP:01E2
-STARTSKIP			  Near	 DGROUP:021A
+SKIPSYMB			  Near	 DGROUP:0207
+SKIP_SPACE			  Near	 DGROUP:022F
+SKIP_STRING			  Near	 DGROUP:01FD
+STARTSKIP			  Near	 DGROUP:0235
 STRINGSIZE			  Word	 DGROUP:0002
 STRINGSTART			  Word	 DGROUP:0000
 TESTSIGN			  Near	 DGROUP:0006
-WRIGHTSIGN			  Near	 DGROUP:0166
+WRIGHTSIGN			  Near	 DGROUP:0169
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
-  _DATA				  16  002B Word	  Public  DATA
-  _TEXT				  16  0221 Word	  Public  CODE
+  _DATA				  16  0068 Word	  Public  DATA
+  _TEXT				  16  023C Word	  Public  CODE
 
