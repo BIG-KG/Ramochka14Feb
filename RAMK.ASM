@@ -8,14 +8,14 @@ org 100h
 StringStart dw 0
 StringSize  dw 0
 RamkStyle   dw 0
-testSIGN: db '3 3 very very lon testsign for test on 24Febx$ 0 123456789 '
+testSIGN: db '3 3 very very lon testsign for test on 24Febx$ 1 '
 
 oneLine     db 218, 196, 191, 179, 0, 179, 192, 196, 217
 doubleline  db 201, 205, 187, 186, 0, 186, 200, 205, 188	
 hearts      db 3,   3,   3,   3,   0, 3,   3,   3,   3
 
 
-modesArray dw 0, offset oneLine
+modesArray dw 0, offset oneLine, offset doubleline, offset hearts
 .code
 
 main:
@@ -198,7 +198,7 @@ Drawline proc
 
 ; bx - current simb, dx - current arg
 getarg:
-    mov bx, 80h
+    mov bx, 81h	
     call skip_space
 	call get_num
 	mov si, ax;xcoord
@@ -215,7 +215,7 @@ getarg:
 	call get_num
 	mov RamkStyle, ax
 
-	cmp al, 0
+	cmp ax, 0
 	jne PresetMode
 
 	call skip_space
@@ -283,6 +283,7 @@ skip_space:
 	IsspaseTEst:
 	cmp al, [bx]
 	je startSkip
+	
 	pop ax
 	ret	
 
