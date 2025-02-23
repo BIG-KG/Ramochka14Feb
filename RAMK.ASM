@@ -9,6 +9,7 @@ EndOfStringAdr	dw 0
 StringStart 	dw 0
 StringSize  	dw 0
 RamkStyle   	dw 0
+colorAttribute        db 0
 testSIGN: 		db '3 3 very very lon testsign for test on 24Febx$ 1 '
 
 oneLine     db 218, 196, 191, 179, 0, 179, 192, 196, 217
@@ -28,7 +29,7 @@ main proc
 	add al, [bx]
 	mov EndOfStringAdr, ax
 
-	mov bp, 0					
+	xor bp, bp					
 	call getarg					; func gets argument from command line, in addres 81h
 	call calculateFrameSize
 	call calculateFrameStyle
@@ -55,14 +56,15 @@ calculateFrameSize:
 
 
 calculateFrameStyle:
-	push dx
-	mov dx, RamkStyle
-	and dx, 111b
-	imul dx, 2 
-	mov di, offset modesArray
-	add	di, dx
-	mov di, [di]
-	pop dx
+	push 	dx
+	mov 	dx, RamkStyle
+	and 	dx, 111b
+	imul 	dx, 2 
+	mov 	di, offset modesArray
+	add		di, dx
+	mov 	di, [di]
+	pop 	dx
+
 	ret
 
 
@@ -161,35 +163,56 @@ letter     db 'Hi guys!'
 ; destr - dx, cx, bx
 Drawline proc
 
-	mov dx, 0b800h; di - symbol sourse
-	mov es, dx
-	mov dx, bx
+	push si
+	push dx
+	mov si, dx
+	mov dl, colorAttribute
+
+	mov si, 0b800h; di - symbol sourse
+	mov es, si
+	mov si, bx
 	imul bx, 80;bx - current copyng symbol
 	add bx, ax
 	imul bx, 2
 
-	imul dx, 80; dx - max copying symbol
-	add dx, cx
-	imul dx, 2
+	imul si, 80; si - max copying symbol
+	add si, cx
+	imul si, 2
 
 	mov cl, [di]
 	mov es:[bx], cl
 
 	mov cl, [di + 1]	
+	inc bx
+	cmp dl, 0
+	je Check
+	mov es:[bx], dl		;if color attribute != 0 => mov color attribute
 	jmp Check
 	
     Do:
 	mov es:[bx], cl
-	
+	inc bx
+	cmp dl, 0
+	je Check
+	mov es:[bx], dl		;if color attribute != 0 => mov color attribute
+		
     Check:
-	add bx, 2
-	cmp dx, bx
+	inc bx
+	cmp si, bx
 	jg Do
 
 	mov cl, [di + 2]
 	mov es:[bx], cl
+	inc bx
 
+	cmp dl, 0
+	je BaseColor
+	mov es:[bx], dl		;if color attribute != 0 => mov color attribute
 
+	BaseColor:
+
+	pop dx
+	pop si
 	
 	ret
 	
@@ -199,16 +222,20 @@ Drawline proc
 
 ; bx - current simb, dx - current arg
 getarg proc
-    mov bx, 81h	
-    call skip_space
+    mov bx, 81h					;get first dec arg (xStart)
+    call skip_space				;skip spaces to next arg
 	call get_num
 	mov si, ax;xcoord
 
-	call skip_space
-	call get_num
+	call skip_space				;get first dec arg (xStart)
+	call get_num				;skip spaces to next arg	
 	mov di, ax; yCoord
 
-	call skip_space
+	call skip_space				;get third hex arg (color)
+	call get_hex_num			;skip spaces to next arg
+	mov colorAttribute, al
+
+	call skip_space				
 	mov StringStart, bx
 	call skip_string
 
@@ -237,33 +264,33 @@ getarg endp
 
 ;DESTRT - CX, DX, BX
 skip_string:
-	xor cx, cx
-	mov cx, '$'
-	xor dx, dx
-	jmp isEndOfString
+	xor cx, cx				;|set constants
+	mov cx, '$'				;|($ - end of string symbol)
+	xor dx, dx				;|
+	jmp isEndOfString		;|
 
 	skipSymb:
-	inc bx
-	inc dx
+	inc bx					;go to next symbol
+	inc dx					;inc lenth counter
 
 	isEndOfString:
-	cmp [bx], cl
+	cmp [bx], cl			;is currentsymb == $
 	jne skipSymb
 
-	inc bx
-	mov StringSize, dx
+	inc bx					; go to the next not '$'symb
+	mov StringSize, dx	    ; Store the length of the string
 
 	ret
 
 ; DESTRT - AX, CX
 get_num proc
-	xor al, al				
+	xor al, al					; sets constants
 	xor dx, dx
 	mov bp, ' '
 
 	addToNum:					; ax = ax * 10 + (next_number_inString, ax - result value)
-	imul ax, 10
-	mov cx, [bx]
+	imul ax, 10					;num += delta (num = (num * 10h) + delta)
+	mov cx, [bx]	
 	sub cx, '0'
 	add al, cl
 	inc bx						; current_addres ++
@@ -272,11 +299,10 @@ get_num proc
 	cmp bx, EndOfStringAdr		; if End of string(bx == EndOfStringAdr) go to return
 	jge EndOfString
 
-	isPartOfNum:
 	xor cx, cx					; if currSimb([bx]) is not spase repeat
 	mov cl, [bx]
 	cmp bp, cx
-	jne addToNum
+	jne addToNum				;num += delta (num = (num * 10h) + delta)
 
 
 	EndOfString:
@@ -284,14 +310,52 @@ get_num proc
 	ret
 get_num endp
 
+
+get_hex_num proc
+	mov bp, ' '					;
+	xor al, al					
+	xor dx, dx
+
+	addToNum_hex:				; ax = ax * 10 + (next_number_inString, ax - result value)
+	shl ax, 4
+	mov cl, [bx]				; number part=> <55 , alfapart => >55 
+	cmp cl, 60
+	jge hexPart					;if nmber has 1-10 part	
+	sub cl, '0'
+	add al, cl
+	jmp endOfcicle
+
+	hexPart:
+	sub cl, 55					; to process if number has A-F
+	add al, cl
+	
+	endOfcicle:
+
+	inc bx						; current_addres ++
+	inc dx						; sizeOfString ++
+
+	cmp bx, EndOfStringAdr		; if End of string(bx == EndOfStringAdr) go to return
+	jge EndOfString_hex
+
+	xor cx, cx					; if currSimb([bx]) is not spase repeat
+	mov cl, [bx]
+	cmp bp, cx
+	jne addToNum_hex
+
+
+	EndOfString_hex:
+
+	ret
+get_hex_num endp
+
 skip_space:
-	push ax 
-	mov al, ' '
-	jmp IsspaseTEst
-	startSkip:
-	inc bx
+	push ax         				;save ax      
+	mov al, ' '												
+	jmp IsspaseTEst	
+	startSkip:						
+	inc bx							;go to the next sibmbol
 	IsspaseTEst:
-	cmp al, [bx]
+	cmp al, [bx]					;if not ' ' => go next
 	je startSkip
 	
 	pop ax
